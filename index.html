@@ -6,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Document</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=1" />
 </head>
 
 <body>
-  <div id="root">
+  <main id="root">
     <input id="input" placeholder="Agregar cosa por hacer" type="text" />
     <ul id="lista">
       <li>
@@ -35,7 +35,10 @@
         <span>X</span>
       </li>
     </ul>
-  </div>
+    <aside class="has-error" id="error-container">
+      <h3 id="error-message">Este es un error</h3>
+    </aside>
+  </main>
 
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.min.js"></script> -->
   <!-- <script src="node_modules/redux/dist/redux.js"></script> -->

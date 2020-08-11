@@ -5,7 +5,10 @@ import { createStore, combineReducers } from "redux";
 let input = document.getElementById("input");
 let addEmail = document.getElementById('addEmail')
 let lista = document.getElementById("lista");
-let emailList = document.getElementById('emailsList')
+let emailList = document.getElementById('emailsList');
+const errorWrapper = document.getElementById('error-container');
+const errorMessage = document.getElementById('error-message');
+
 let todos = {
   0: {
     text: "Ir al cine",
@@ -113,14 +116,39 @@ addEmail.addEventListener('keydown', e => {
   if (e.key === "Enter") {
     let email = e.target.value
     e.target.value = ""
+    addEmailIfIsValid(email)
+  }
+})
+
+// REDUX
+
+//Validators
+
+function isValidEmail(email)
+{
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
+
+function addEmailIfIsValid(email) {
+  const { emails } = store.getState()
+  store.dispatch({ type: "DELETE_ERROR" });
+  if(emails.includes(email) || !isValidEmail(email)) {
+    const error = {
+      hasError: true,
+      message: `${email} ya se encuentra en la fila o es invalido.`
+    };
+    store.dispatch({
+      type: "ADD_ERROR",
+      error
+    });
+  } else {
     store.dispatch({
       type: "ADD_EMAIL",
       email
     })
   }
-})
-
-// REDUX
+}
 
 // segundo reducer para correos
 function emailsReducer(state = [], action) {
@@ -151,15 +179,41 @@ function todosReducer(state = {}, action) {
   }
 }
 
+function drawError() {
+  errorMessage.innerHTML = "";
+  errorWrapper.classList.remove('show');
+  const { error } = store.getState();
+  if (error.hasError) {
+    errorMessage.innerHTML = error.message;
+    errorWrapper.classList.add('show');
+  }
+}
+
+function errorReducer(state = {}, action) {
+  switch (action.type) {
+    case "ADD_ERROR":
+      return { ...state, ...action.error};
+    case "DELETE_ERROR":
+      return { ...state, ...{ hasError: false, message: ''} };
+    default:
+      return state
+  }
+}
+
 //combinar los reducers
 let rootReducer = combineReducers({
   todos: todosReducer,
-  emails: emailsReducer
+  emails: emailsReducer,
+  error: errorReducer
 })
 
 // store
 let store = createStore(rootReducer, {
   emails: ["bliss@gmail.com"],
+  error: {
+    hasError: false,
+    message: ''
+  },
   todos: {
     0: {
       text: "crear store",
@@ -177,8 +231,10 @@ let store = createStore(rootReducer, {
 store.subscribe(() => {
   drawTodos()
   drawEmails()
+  drawError()
 })
 
 //init
 drawTodos();
 drawEmails();
+drawError();
